@@ -39,11 +39,11 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.1
         if: ${{ !env.ACT && github.ref == 'refs/heads/master' }}
         with:
-          repository-name: iptv-org/api
+          repository-name: Mobassar4u/api
           branch: gh-pages
           folder: .api
           token: ${{ steps.create-app-token.outputs.token }}
-          git-config-name: iptv-bot[bot]
-          git-config-email: 84861620+iptv-bot[bot]@users.noreply.github.com
-          commit-message: '[Bot] Deploy to iptv-org/api'
+          git-config-name: Mobassar4u[bot]
+          git-config-email: 92091277+Mobassar4u[bot]@users.noreply.github.com
+          commit-message: '[Bot] Deploy to Mobassar4u/api'
           clean: false

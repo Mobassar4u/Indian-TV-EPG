@@ -1,0 +1,8 @@
+body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+.header { padding: 20px; background: #1f1f1f; border-bottom: 2px solid #e50914; }
+.channel-row { display: flex; border-bottom: 1px solid #333; height: 100px; align-items: center; }
+.channel-info { min-width: 150px; text-align: center; background: #1a1a1a; padding: 10px; border-right: 1px solid #444; }
+.channel-info img { width: 40px; display: block; margin: 0 auto 5px; }
+.program-list { display: flex; overflow-x: auto; gap: 10px; padding: 10px; }
+.program-card { min-width: 200px; background: #262626; padding: 10px; border-radius: 5px; }
+.time { color: #e50914; font-weight: bold; font-size: 0.8em; }

@@ -1,4 +1,4 @@
-name: India TV EPG Update
+name: IPTV-EPG Update
 on:
   schedule:
     - cron: '30 18 * * *'  # 12:00 AM IST

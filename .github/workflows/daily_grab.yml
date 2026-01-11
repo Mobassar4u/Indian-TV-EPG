@@ -1,0 +1,27 @@
+name: Daily EPG Grabber
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at 00:00 UTC
+  workflow_dispatch: # Allows manual run
+
+jobs:
+  grab-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch EPG and Channels
+        run: |
+          # Fetching the most stable Indian EPG source (approx 500+ channels)
+          curl -L "https://avkb.short.gy/tsepg.xml.gz" -o public/epg.xml.gz
+          # Unzip it so the browser can read it easily
+          gunzip -f public/epg.xml.gz
+          # Fetch the M3U for Logos and IDs
+          curl -L "https://iptv-org.github.io/iptv/countries/in.m3u" -o public/channels.m3u
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: public
+          branch: gh-pages # This creates a special branch for your website

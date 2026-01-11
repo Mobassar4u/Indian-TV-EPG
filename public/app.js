@@ -1,58 +1,43 @@
-async function initEPG() {
-    try {
-        const [xmlRes, m3uRes] = await Promise.all([
-            fetch('./epg.xml'),
-            fetch('./channels.m3u')
-        ]);
-
-        const xmlText = await xmlRes.text();
-        const m3uText = await m3uRes.text();
-        
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-        const programmes = Array.from(xmlDoc.getElementsByTagName("programme"));
-        
-        // Match M3U channels to XML data
-        const channels = parseM3U(m3uText);
-        const container = document.getElementById("epg-grid");
-        container.innerHTML = "";
-
-        channels.slice(0, 50).forEach(ch => { // Limit to 50 for performance
-            const chProgs = programmes.filter(p => p.getAttribute("channel") === ch.id);
-            if (chProgs.length > 0) {
-                renderRow(container, ch, chProgs);
-            }
-        });
-    } catch (e) {
-        document.getElementById("epg-grid").innerHTML = "Failed to load Guide. Run the GitHub Action first.";
-    }
-}
-
-function parseM3U(text) {
-    return text.split('#EXTINF').slice(1).map(line => ({
-        id: line.match(/tvg-id="([^"]+)"/)?.[1],
-        logo: line.match(/tvg-logo="([^"]+)"/)?.[1],
-        name: line.split(',')[1]?.split('\n')[0].trim()
-    })).filter(c => c.id);
-}
-
 function renderRow(container, ch, progs) {
     const row = document.createElement("div");
     row.className = "channel-row";
+    
+    // Sort programs by time so history comes first
+    const sortedProgs = progs.sort((a, b) => 
+        a.getAttribute("start").localeCompare(b.getAttribute("start"))
+    );
+
     row.innerHTML = `
         <div class="channel-info">
-            <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40'">
+            <img src="${ch.logo}">
             <span>${ch.name}</span>
         </div>
         <div class="program-list">
-            ${progs.slice(0, 10).map(p => `
-                <div class="program-card">
-                    <div class="time">${p.getAttribute("start").substring(8,12)}</div>
-                    <div class="title">${p.getElementsByTagName("title")[0].textContent}</div>
-                </div>
-            `).join('')}
+            ${sortedProgs.map(p => {
+                const startTime = p.getAttribute("start");
+                const isPast = isProgramInPast(startTime);
+                
+                return `
+                    <div class="program-card ${isPast ? 'catchup-available' : ''}">
+                        <div class="time">${startTime.substring(8,12)}</div>
+                        <div class="title">${p.getElementsByTagName("title")[0].textContent}</div>
+                        ${isPast ? '<span class="badge">Catchup</span>' : ''}
+                    </div>
+                `;
+            }).join('')}
         </div>`;
     container.appendChild(row);
 }
 
-initEPG();
+// Helper to check if a program has already finished
+function isProgramInPast(xmlTime) {
+    // Format: YYYYMMDDHHMMSS
+    const year = xmlTime.substring(0, 4);
+    const month = xmlTime.substring(4, 6) - 1;
+    const day = xmlTime.substring(6, 8);
+    const hour = xmlTime.substring(8, 10);
+    const min = xmlTime.substring(10, 12);
+    
+    const progDate = new Date(year, month, day, hour, min);
+    return progDate < new Date();
+}

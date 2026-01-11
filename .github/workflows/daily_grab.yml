@@ -15,7 +15,7 @@ jobs:
         run: |
           mkdir -p public
           # Fetching an EPG source known for 7-day history/catchup data
-          curl -L "https://avkb.short.gy/tsepg.xml.gz" -o public/epg.xml.gz
+          curl -L "https://avkb.short.gy/jioepg.xml.gz" -o public/epg.xml.gz
           # We keep it as .gz to save space and bandwidth, players handle .gz perfectly
           
           # Fetch a matching M3U with catchup tags

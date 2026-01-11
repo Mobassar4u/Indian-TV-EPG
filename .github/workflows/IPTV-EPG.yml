@@ -19,7 +19,7 @@ jobs:
       - name: Generate EPG
         run: |
           pip install lxml
-          python epg_grabber.py
+          python EPG-Grabber.py
       
       - name: Commit
         run: |

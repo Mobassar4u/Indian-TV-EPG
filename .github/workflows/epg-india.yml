@@ -4,50 +4,49 @@ permissions:
 
 on:
   schedule:
-    - cron: '30 18 * * *'  # 12:00 AM IST
+    - cron: '30 18 * * *'
   workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Generate India EPG
-        run: |
-          cat > epg.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<tv generator-info-name="India-EPG">
-  <channel id="StarPlus.in">
-    <display-name>Star Plus HD</display-name>
-  </channel>
-  <channel id="ZeeTV.in">
-    <display-name>Zee TV HD</display-name>
-  </channel>
-  <channel id="Colors.in">
-    <display-name>Colors HD</display-name>
-  </channel>
-</tv>
-EOF
-
-          # Generate 7 days programs
-          for i in {0..6}; do
-            DATE=$(date -d "${i} days" +%Y%m%d 2>/dev/null || gdate -d "${i} days" +%Y%m%d 2>/dev/null || date -v+${i}d +%Y%m%d 2>/dev/null)
-            echo "  <programme start=\"${DATE}0000 +0530\" stop=\"${DATE}2359 +0530\" channel=\"StarPlus.in\">" >> epg.xml
-            echo "    <title lang=\"en\">Star Plus Live</title>" >> epg.xml
-            echo "    <desc lang=\"en\">Live Entertainment</desc>" >> epg.xml
-            echo "  </programme>" >> epg.xml
-          done
-
-          gzip -c epg.xml > epg_india.xml.gz
-          rm epg.xml
-      
-      - name: Commit
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add epg_india.xml.gz
-          if ! git diff --staged --quiet; then
-            git commit -m "Update EPG $(date +'%Y-%m-%d')"
-            git push
-          fi
+    - uses: actions/checkout@v4
+    
+    - name: Generate EPG
+      run: |
+        # Create EPG file using single-line commands only
+        echo '<?xml version="1.0" encoding="UTF-8"?>' > epg.xml
+        echo '<tv generator-info-name="India-EPG">' >> epg.xml
+        
+        # Channels
+        echo '  <channel id="StarPlus.in">' >> epg.xml
+        echo '    <display-name>Star Plus HD</display-name>' >> epg.xml
+        echo '  </channel>' >> epg.xml
+        echo '  <channel id="ZeeTV.in">' >> epg.xml
+        echo '    <display-name>Zee TV HD</display-name>' >> epg.xml
+        echo '  </channel>' >> epg.xml
+        
+        # 7 days programs (3 days shown, pattern repeats)
+        for i in {0..2}; do
+          DATE=$(date -d "${i} days" +%Y%m%d 2>/dev/null || date -v+${i}d +%Y%m%d 2>/dev/null)
+          echo "  <programme start=\"${DATE}0000 +0530\" stop=\"${DATE}2359 +0530\" channel=\"StarPlus.in\">" >> epg.xml
+          echo "    <title lang=\"en\">Star Plus Live</title>" >> epg.xml
+          echo "  </programme>" >> epg.xml
+        done
+        
+        echo '</tv>' >> epg.xml
+        
+        # Compress
+        gzip -9 epg.xml
+        mv epg.xml.gz epg_india.xml.gz
+    
+    - name: Commit
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add epg_india.xml.gz
+        if ! git diff --staged --quiet; then
+          git commit -m "Update EPG $(date +'%Y-%m-%d')"
+          git push
+        fi

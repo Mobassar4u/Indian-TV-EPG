@@ -2,7 +2,7 @@ name: India TV EPG Update
 
 on:
   schedule:
-    - cron: '30 18 * * *'  # 12:00 AM IST daily
+    - cron: '30 18 * * *'  # 12:00 AM IST
   workflow_dispatch:
 
 jobs:
@@ -18,19 +18,20 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci
       
-      - name: Generate EPG
-        run: npm run grab -- --config=sites/in/ --gzip --output=epg.xml.gz --days=7
+      - name: Create sites directory
+        run: mkdir -p sites/in
       
-      - name: Commit changes
+      - name: Generate India EPG
+        run: npm run grab -- --sites=in --days=7 --output=epg_india.xml.gz
+      
+      - name: Commit EPG
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add epg.xml.gz
-          if git diff --staged --quiet; then
-            echo "No EPG changes"
-          else
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add epg_india.xml.gz
+          if ! git diff --staged --quiet; then
             git commit -m "Update India EPG $(date +%Y-%m-%d)"
             git push
           fi

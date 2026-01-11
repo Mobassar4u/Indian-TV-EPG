@@ -1,23 +1,6 @@
-name: Update EPG Data
-on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Download Indian EPG
+- name: Download Indian Data
         run: |
-          # Fetching from a reliable Indian source (Tata Play EPG)
+          # Fetch EPG (Schedules)
           curl -L "https://iptv-org.github.io/epg/guides/in/tata-play.xml" -o public/data.xml
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: public
-          branch: gh-pages
+          # Fetch M3U (Channel List with Logos)
+          curl -L "https://iptv-org.github.io/iptv/countries/in.m3u" -o public/channels.m3u

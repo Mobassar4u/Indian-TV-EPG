@@ -6,13 +6,10 @@
   <channel id="ZeeTV.in">
     <display-name>Zee TV</display-name>
   </channel>
-  <channel id="SonySET.in">
-    <display-name>Sony SET</display-name>
+  <channel id="SonyEntertainmentTV.in">
+    <display-name>Sony TV</display-name>
   </channel>
   <channel id="StarSports1.in">
     <display-name>Star Sports 1</display-name>
-  </channel>
-  <channel id="SunTV.in">
-    <display-name>Sun TV</display-name>
   </channel>
 </tv>

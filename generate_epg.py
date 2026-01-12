@@ -29,7 +29,7 @@ def fetch_epg():
         target_date = (datetime.datetime.now() + datetime.timedelta(days=day_offset)).strftime("%d-%m-%Y")
         
         for ch in CHANNELS:
-            url = f"https://tm-api.tataplay.com/content-detail/pub/api/v1/channels/{ch['id']}/schedule?date={target_date}"
+            url = f"https://www.tataplay.com/web-guide/api/v1/channels/{ch['id']}/schedule?date={target_date}"
             try:
                 response = requests.get(url, timeout=15).json()
                 programs = response.get('data', {}).get('schedules', [])

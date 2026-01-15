@@ -35,6 +35,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add epg.xml
-          git commit -m "Auto update hybrid EPG" || echo "No changes to commit"
+          git add hybrid-epg.xml
+          git commit -m "Auto update Hybrid-EPG" || echo "No changes to commit"
           git push
